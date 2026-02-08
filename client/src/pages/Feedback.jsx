@@ -3,14 +3,14 @@ const testimonials = [
     name: "Aman Gupta",
     gender: "Male",
     img: "https://randomuser.me/api/portraits/men/32.jpg",
-    text: "OnlineCompilerCode made coding so much easier! No installations, just code and run instantly.",
+    text: "CompileHub made coding so much easier! No installations, just code and run instantly.",
     rating: 5,
   },
   {
     name: "Rohit Kumar",
     gender: "Male",
     img: "https://randomuser.me/api/portraits/men/41.jpg",
-    text: "Great platform, but I’d love to see more languages supported in the future.",
+    text: "Great platform, but I'd love to see more languages supported in the future.",
     rating: 4,
   },
   {
@@ -45,43 +45,45 @@ const testimonials = [
 
 export default function FeedbackSection() {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-16">
-      <h2 className="text-3xl sm:text-4xl font-extrabold text-center text-green-600 mb-12">
-        🚀 What Users Say
-      </h2>
+    <section className="py-20 px-4 sm:px-6 md:px-10 relative">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16 animate-fadeIn">
+          <h2 className="text-5xl sm:text-6xl font-black gradient-text mb-6">
+            What Users Say
+          </h2>
+          <p className="text-gray-400 text-xl">Trusted by thousands of developers worldwide</p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {testimonials.map((t, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition"
-          >
-            {/* User Info */}
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src={t.img}
-                alt={t.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <h3 className="font-semibold text-gray-800">{t.name}</h3>
-                <p className="text-gray-500 text-sm">{t.gender}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.map((t, i) => (
+            <div
+              key={i}
+              className="card group hover:scale-105 transition-all duration-300"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <img
+                  src={t.img}
+                  alt={t.name}
+                  className="w-16 h-16 rounded-full object-cover border-4 border-emerald-500/30 group-hover:border-emerald-500/50 transition-all"
+                />
+                <div>
+                  <h3 className="font-bold text-white text-lg">{t.name}</h3>
+                  <p className="text-gray-400 text-sm">{t.gender}</p>
+                </div>
+              </div>
+
+              <p className="text-gray-300 mb-4 leading-relaxed">{t.text}</p>
+
+              <div className="flex text-yellow-400 text-xl">
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <span key={idx}>
+                    {idx < t.rating ? "★" : "☆"}
+                  </span>
+                ))}
               </div>
             </div>
-
-            {/* Feedback */}
-            <p className="text-gray-700 mb-4">{t.text}</p>
-
-            {/* Rating */}
-            <div className="flex text-yellow-500 text-lg">
-              {Array.from({ length: 5 }).map((_, idx) => (
-                <span key={idx}>
-                  {idx < t.rating ? "★" : "☆"}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

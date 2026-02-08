@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FiLock } from "react-icons/fi";
 
 const USER_API_END_POINT = import.meta.env.VITE_API_BASE_URL;
 
@@ -33,8 +34,8 @@ const Settings = () => {
       const response = await axios.put(
         `${USER_API_END_POINT}/update-profile`,
         {
-          password,        // only send new password
-          currentPassword, // send current password for verification
+          password,
+          currentPassword,
         },
         {
           headers: {
@@ -53,55 +54,68 @@ const Settings = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      <h2 className="text-2xl font-bold mb-6">Update Password</h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-emerald-900 to-gray-900 py-16 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="card">
+          <h2 className="text-4xl font-black gradient-text mb-8">Update Password</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">New Password</label>
-          <input
-            type="password"
-            placeholder="New Password"
-            className="w-full border px-4 py-2 rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block mb-2 font-semibold text-gray-300">New Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-gray-300">Confirm New Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-red-400">
+                Current Password *
+              </label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  placeholder="Enter Current Password"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary w-full py-4"
+            >
+              Update Password
+            </button>
+          </form>
         </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Confirm New Password</label>
-          <input
-            type="password"
-            placeholder="Confirm New Password"
-            className="w-full border px-4 py-2 rounded"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium text-red-600">
-            Current Password *
-          </label>
-          <input
-            type="password"
-            placeholder="Enter Current Password"
-            className="w-full border px-4 py-2 rounded"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-        >
-          Update Password
-        </button>
-      </form>
+      </div>
     </div>
   );
 };

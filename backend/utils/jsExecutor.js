@@ -57,20 +57,37 @@ export const runJavaScript = async (code, input = "") => {
       const start = process.hrtime();
       const startMem = process.memoryUsage().rss;
       let output = "";
+      const inputs = input.split('\n').filter(line => line.trim());
+      let inputIndex = 0;
 
       const originalLog = console.log;
       console.log = (...args) => {
         output += args.join(" ") + "\n";
       };
 
-      // Provide input via a simple prompt simulation
-      const originalPrompt = global.prompt;
-      global.prompt = () => input; // always return the provided input
+      // Mock prompt to return input values
+      global.prompt = (message) => {
+        let value = inputs[inputIndex] || "";
+        inputIndex++;
+        // Extract first number if multiple values on same line
+        value = value.trim().split(/\s+/)[0];
+        output += `${message} ${value}\n`;
+        return value;
+      };
 
-      eval(code); // CAUTION: eval can be unsafe
+      // Mock alert to log output (only if not already logged)
+      global.alert = (message) => {
+        // Don't add if console.log already added it
+        if (!output.includes(message)) {
+          output += message + "\n";
+        }
+      };
+
+      eval(code);
 
       console.log = originalLog;
-      global.prompt = originalPrompt;
+      delete global.prompt;
+      delete global.alert;
 
       const [s, ns] = process.hrtime(start);
       resolve({

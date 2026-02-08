@@ -91,7 +91,7 @@ export default function WatchDemo() {
             <p key={index}>{text}</p>
           ))}
           <p className="text-sm text-gray-700">
-            Ready to explore <strong>{currentVideo.name}</strong>? <span className="text-green-700 font-semibold">Start now on CompileCode!</span>
+            Ready to explore <strong>{currentVideo.name}</strong>? <span className="text-green-700 font-semibold">Start now on CompileHub!</span>
           </p>
         </div>
       </div>
