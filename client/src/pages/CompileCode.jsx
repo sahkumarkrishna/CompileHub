@@ -125,7 +125,6 @@ const CompileCode = () => {
                 <option value="java">Java</option>
                 <option value="c">C</option>
                 <option value="cpp">C++</option>
-                <option value="rust">Rust</option>
               </select>
             </div>
 
