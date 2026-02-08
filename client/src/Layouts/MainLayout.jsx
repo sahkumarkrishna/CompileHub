@@ -72,7 +72,7 @@ function MainLayout() {
                 </div>
                 <div className="flex items-center gap-2">
                   <FiPhone className="text-green-400" />
-                  <span>+91 98015 52XXX</span>
+                  <span>+91 9334554413</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FiMapPin className="text-green-400" />
