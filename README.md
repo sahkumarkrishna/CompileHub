@@ -1,89 +1,55 @@
-# CompileHub
+# 🚀 CompileCode
 
-A full-stack code compilation and execution platform with user authentication.
+**Power Up Your Coding Experience.**  
+An interactive and seamless coding platform that supports multiple languages and tools — built with the power of the **MERN stack**.
 
-## Features
+---
 
-- User authentication (signup/login)
-- Code editor with Monaco Editor
-- Multi-language code compilation and execution
-- Code history and management
-- PDF export functionality
+## 🌟 Overview
 
-## Tech Stack
+**CompileCode** is a web-based development environment designed for learners, developers, and teams to code, test, and preview projects across popular programming languages without needing to install compilers locally.
 
-**Frontend:**
-- React 19
-- Vite
-- TailwindCSS
-- Monaco Editor
-- React Router
-- Axios
+### 🛠️ Key Features
 
-**Backend:**
-- Node.js
-- Express
-- MongoDB (Mongoose)
-- JWT Authentication
-- bcryptjs
+- 🎥 Language-specific demo videos (Python, JavaScript, C, C++, Java)
+- 🖥️ Live code preview and real-time execution
+- 🤖 AI-based autocomplete & syntax help
+- ☁️ Cloud-synced workspace
+- 👥 Team collaboration and version control
+- 🌐 Cross-language switching in one click
 
-## Installation
+---
 
-### Prerequisites
-- Node.js >= 18.0.0
-- MongoDB
+## 🧱 Tech Stack (MERN)
 
-### Setup
+| Layer        | Tech                 |
+|--------------|----------------------|
+| **Frontend** | React.js, Tailwind CSS, Shadcn UI |
+| **Backend**  | Node.js, Express.js  |
+| **Database** | MongoDB Atlas        |
+| **Auth**     | JWT Authentication   |
+| **DevOps**   | Render / Vercel + GitHub Actions |
 
-1. Clone the repository
-```bash
-git clone <repository-url>
-cd CompileHub
-```
 
-2. Install dependencies
-```bash
-npm install
-cd client && npm install
-cd ../backend && npm install
-```
 
-3. Configure environment variables
+💡 Inspiration
+CompileCode is inspired by platforms like Replit, CodePen, and LeetCode, offering a simpler, lightweight yet powerful environment with educational features for learning and growth.
 
-Create `.env` files in root, backend, and client directories with required variables.
+🧑‍💻 Contributors
+Krishna Kumar – Full Stack Developer
 
-4. Run the application
+Open for contributions – create a PR or submit an issue!
 
-**Development:**
-```bash
-npm run dev
-```
+📜 License
+This project is licensed under the MIT License. See LICENSE for details.
 
-**Production:**
-```bash
-npm run build
-npm start
-```
+🚀 Power Up Your Coding Experience with CompileCode — designed for developers, by developers.
 
-## Project Structure
 
-```
-CompileHub/
-├── backend/          # Express server
-│   ├── config/       # Database configuration
-│   ├── controllers/  # Route controllers
-│   ├── models/       # MongoDB models
-│   ├── routes/       # API routes
-│   └── utils/        # Utility functions
-├── client/           # React frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── services/
-│   └── public/
-└── README.md
-```
+---
 
-## License
-
-ISC
+Let me know if you'd like:
+- A version with badges (e.g., build, license, etc.)
+- Deployment instructions for Vercel / Render
+- Logo or screenshot embeds  
+- GitHub repo boilerplate setup (`init`, `commit`, etc.)
