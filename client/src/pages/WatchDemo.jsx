@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Play, Code2, Sparkles } from 'lucide-react';
 
 const demoVideos = {
   python: {
@@ -58,41 +59,79 @@ export default function WatchDemo() {
   const currentVideo = demoVideos[selectedLang];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto text-gray-800 space-y-8">
-      <h1 className="text-3xl font-bold mb-4">👀 Watch Language Demos</h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-3">
+          <div className="flex items-center justify-center gap-3">
+            <Play className="w-10 h-10 text-indigo-600" />
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Watch Language Demos
+            </h1>
+          </div>
+          <p className="text-gray-600 text-lg">Learn programming languages through interactive video tutorials</p>
+        </div>
 
-      <select
-        className="mb-6 p-2 border border-gray-300 rounded shadow-sm"
-        value={selectedLang}
-        onChange={(e) => setSelectedLang(e.target.value)}
-      >
-        {Object.entries(demoVideos).map(([key, lang]) => (
-          <option key={key} value={key}>{lang.name}</option>
-        ))}
-      </select>
-
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* Video Section */}
-        <div className="w-full lg:w-[700px]">
-          <div className="w-full h-[400px]">
-            <iframe
-              className="w-full h-full rounded shadow-lg"
-              src={currentVideo.url}
-              title={`${currentVideo.name} Demo`}
-              frameBorder="0"
-              allowFullScreen
-            ></iframe>
+        {/* Language Selector */}
+        <div className="flex justify-center">
+          <div className="inline-flex gap-2 p-2 bg-white rounded-xl shadow-lg flex-wrap justify-center">
+            {Object.entries(demoVideos).map(([key, lang]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedLang(key)}
+                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                  selectedLang === key
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md scale-105'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Text Section */}
-        <div className="w-full lg:flex-1 bg-teal-100 p-6 rounded-lg text-gray-900 text-lg leading-relaxed max-h-[500px] overflow-y-auto space-y-4">
-          {currentVideo.description.map((text, index) => (
-            <p key={index}>{text}</p>
-          ))}
-          <p className="text-sm text-gray-700">
-            Ready to explore <strong>{currentVideo.name}</strong>? <span className="text-green-700 font-semibold">Start now on CompileHub!</span>
-          </p>
+        {/* Content Section */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Video Section */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 flex items-center gap-3">
+                <Code2 className="w-6 h-6 text-white" />
+                <h2 className="text-xl font-bold text-white">{currentVideo.name} Tutorial</h2>
+              </div>
+              <div className="aspect-video">
+                <iframe
+                  className="w-full h-full"
+                  src={currentVideo.url}
+                  title={`${currentVideo.name} Demo`}
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          </div>
+
+          {/* Description Section */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-xl p-6 h-full">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-6 h-6 text-indigo-600" />
+                <h3 className="text-2xl font-bold text-gray-800">About {currentVideo.name}</h3>
+              </div>
+              <div className="space-y-4 text-gray-700 leading-relaxed max-h-[400px] overflow-y-auto">
+                {currentVideo.description.map((text, index) => (
+                  <p key={index} className="text-sm">{text}</p>
+                ))}
+                <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border-l-4 border-indigo-600">
+                  <p className="text-sm font-semibold text-gray-800">
+                    Ready to explore <span className="text-indigo-600">{currentVideo.name}</span>?
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">Start coding now on CompileHub!</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ const defaultCode = {
   c: `#include <stdio.h>\nint main() {\n  printf("Hello, world!\\n");\n  return 0;\n}`,
   cpp: `#include <iostream>\nusing namespace std;\nint main() {\n  cout << "Hello, world!" << endl;\n  return 0;\n}`,
   java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, world!");\n  }\n}`,
-  rust: `fn main() {\n  println!("Hello, world!");\n}`,
+
 };
 
 const CompileCode = () => {

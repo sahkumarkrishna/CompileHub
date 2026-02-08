@@ -160,8 +160,24 @@ export const runC_CPP = async (code, language, input = "") => {
   });
 };
 
-// Java Runner
+// Check if Java is installed
+const checkJavaInstalled = () => {
+  return new Promise((resolve) => {
+    exec('javac -version', (err) => {
+      resolve(!err);
+    });
+  });
+};
+
+// Java Runner with fallback to online API
 export const runJava = async (code, input = "") => {
+  const javaInstalled = await checkJavaInstalled();
+
+  if (!javaInstalled) {
+    // Use JDoodle API as fallback
+    return runJavaOnline(code, input);
+  }
+
   const match = code.match(/public\s+class\s+(\w+)/);
   const className = match ? match[1] : "Main";
   const filePath = createTempFile("java", code, className);
@@ -179,7 +195,6 @@ export const runJava = async (code, input = "") => {
       const child = exec(`java -cp "${tempDir}" ${className}`, (err2, stdout2, stderr2) => {
         const [s, ns] = process.hrtime(start);
 
-        // Cleanup
         cleanupFile(filePath);
         cleanupFile(path.join(tempDir, `${className}.class`));
 
@@ -195,5 +210,69 @@ export const runJava = async (code, input = "") => {
       if (input) child.stdin.write(input);
       child.stdin.end();
     });
+  });
+};
+
+// Online Java execution using Piston API (free)
+const runJavaOnline = async (code, input = "") => {
+  const https = await import('https');
+  const start = Date.now();
+  
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({
+      language: "java",
+      version: "15.0.2",
+      files: [{
+        content: code
+      }],
+      stdin: input
+    });
+
+    const options = {
+      hostname: 'emkc.org',
+      port: 443,
+      path: '/api/v2/piston/execute',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let responseData = '';
+
+      res.on('data', (chunk) => {
+        responseData += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(responseData);
+          const executionTime = Date.now() - start;
+          
+          if (result.compile && result.compile.code !== 0) {
+            reject("Java Compilation Error:\n" + result.compile.stderr);
+          } else if (result.run && result.run.code !== 0 && result.run.stderr) {
+            reject("Java Runtime Error:\n" + result.run.stderr);
+          } else {
+            resolve({
+              stdout: result.run.stdout || result.run.output || "No output",
+              executionTime: `${executionTime} ms`,
+              memoryUsed: "N/A (remote)",
+            });
+          }
+        } catch (err) {
+          reject("Failed to execute Java code: " + err.message);
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      reject("Network error: " + err.message);
+    });
+
+    req.write(data);
+    req.end();
   });
 };
