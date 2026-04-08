@@ -1,10 +1,10 @@
-import { Outlet, Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaGithub } from "react-icons/fa";
-import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
+import { Outlet } from "react-router-dom";
+import UserNavbar from "../components/UserNavbar";
+import Footer from "../components/Footer";
 
-function MainLayout() {
+function MainLayout({ children }) {
   return (
+<<<<<<< HEAD
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
@@ -92,8 +92,17 @@ function MainLayout() {
               <Link to="#" className="hover:text-green-400 transition-colors">Cookie Policy</Link>
             </div>
           </div>
+=======
+    <div className="min-h-screen bg-[#030712] flex flex-col">
+      <UserNavbar />
+      
+      <div className="flex-1 flex flex-col">
+        <div className="flex-1">
+          {children || <Outlet />}
+>>>>>>> 7c98229 (admin login)
         </div>
-      </footer>
+        <Footer />
+      </div>
     </div>
   );
 }

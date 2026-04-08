@@ -12,11 +12,29 @@ export const BUTTON_STYLES = {
 };
 
 export const DEFAULT_CODE = {
-  javascript: `// Write JS code here\nconsole.log("Hello, world!");`,
-  python: `# Write Python code here\nprint("Hello, world!")`,
+  javascript: `// JavaScript\nconsole.log("Hello, world!");`,
+  typescript: `// TypeScript\nconsole.log("Hello, world!");`,
+  python: `# Python\nprint("Hello, world!")`,
+  java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, world!");\n  }\n}`,
   c: `#include <stdio.h>\nint main() {\n  printf("Hello, world!\\n");\n  return 0;\n}`,
   cpp: `#include <iostream>\nusing namespace std;\nint main() {\n  cout << "Hello, world!" << endl;\n  return 0;\n}`,
-  java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, world!");\n  }\n}`,
+  csharp: `using System;\nclass Program {\n  static void Main() {\n    Console.WriteLine("Hello, world!");\n  }\n}`,
+  go: `package main\nimport "fmt"\nfunc main() {\n  fmt.Println("Hello, world!")\n}`,
+  rust: `fn main() {\n  println!("Hello, world!");\n}`,
+  ruby: `puts "Hello, world!"`,
+  php: `<?php\necho "Hello, world!\\n";\n?>`,
+  swift: `print("Hello, world!")`,
+  kotlin: `fun main() {\n  println("Hello, world!")\n}`,
+  scala: `object Main extends App {\n  println("Hello, world!")\n}`,
+  perl: `print "Hello, world!\\n";`,
+  r: `cat("Hello, world!\\n")`,
+  lua: `print("Hello, world!")`,
+  haskell: `main = putStrLn "Hello, world!"`,
+  elixir: `IO.puts("Hello, world!")`,
+  julia: `println("Hello, world!")`,
+  dart: `void main() {\n  print("Hello, world!");\n}`,
+  bash: `echo "Hello, world!"`,
+  powershell: `Write-Host "Hello, world!"`
 };
 
 export const EDITOR_OPTIONS = {

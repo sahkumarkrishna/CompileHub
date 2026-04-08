@@ -1,88 +1,155 @@
 import fs from "fs";
 import path from "path";
 import { v4 as uuid } from "uuid";
-import { exec } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
-// Handle __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Ensure temp directory exists
 const tempDir = path.join(__dirname, "temp");
 if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
-// Create temp file
-const createTempFile = (extension, code, className = null) => {
-  let filename;
-
-  if (extension === "java" && className) {
-    filename = `${className}.java`; // Java requires filename = classname
-  } else {
-    filename = `${uuid()}.${extension}`;
+// ============================================
+// Judge0 CE API (Free public instance)
+// ============================================
+const runWithJudge0 = async (languageId, sourceCode, stdin = "", extraArgs = {}) => {
+  const https = await import('https');
+  const start = Date.now();
+  
+  // Ensure code ends with newline
+  let finalCode = sourceCode;
+  if (!sourceCode.endsWith('\n')) {
+    finalCode = sourceCode + '\n';
   }
-
-  const filePath = path.join(tempDir, filename);
-  fs.writeFileSync(filePath, code);
-  return filePath;
-};
-
-// Cleanup file (optional)
-const cleanupFile = (filePath) => {
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-};
-
-
-// Detect Python command
-const detectPythonCommand = () => {
-  const candidates = ["python", "python3", "py"];
+  
   return new Promise((resolve, reject) => {
-    const tryNext = (i) => {
-      if (i >= candidates.length) return reject("Python not found");
-      exec(`${candidates[i]} --version`, (err) => {
-        if (!err) return resolve(candidates[i]);
-        tryNext(i + 1);
-      });
+    const base64Code = Buffer.from(finalCode).toString('base64');
+    const base64Stdin = Buffer.from(stdin).toString('base64');
+    
+    const payload = {
+      source_code: base64Code,
+      language_id: languageId,
+      stdin: base64Stdin,
+      compile_timeout: 10000,
+      cpu_time_limit: 5,
+      memory_limit: 128000,
+      ...extraArgs
     };
-    tryNext(0);
+    
+    const data = JSON.stringify(payload);
+
+    const options = {
+      hostname: 'ce.judge0.com',
+      port: 443,
+      path: '/submissions?base64_encoded=true&wait=true',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let responseData = '';
+      res.on('data', (chunk) => { responseData += chunk; });
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(responseData);
+          const executionTime = Date.now() - start;
+          const statusId = result.status?.id;
+          
+          if (statusId >= 6) {
+            const output = result.compile_output ? Buffer.from(result.compile_output, 'base64').toString() : "Compilation error";
+            reject("Compilation Error: " + output);
+          } else if (statusId >= 12) {
+            const stderr = result.stderr ? Buffer.from(result.stderr, 'base64').toString() : "Runtime error";
+            reject("Runtime Error: " + stderr);
+          } else if (result.stdout) {
+            const stdout = Buffer.from(result.stdout, 'base64').toString();
+            const stderr = result.stderr ? Buffer.from(result.stderr, 'base64').toString() : '';
+            
+            console.log('Judge0 result - stdout:', stdout, 'stderr:', stderr, 'status:', result.status);
+            
+            resolve({
+              stdout: stdout.trim() || stderr || "Program ran but produced no output",
+              executionTime: `${executionTime} ms`,
+              memoryUsed: `${Math.ceil((result.memory || 0) / 1024)} MB`
+            });
+          } else {
+            resolve({
+              stdout: "No output",
+              executionTime: `${executionTime} ms`,
+              memoryUsed: "0 MB"
+            });
+          }
+        } catch (err) {
+          reject("Execution failed: " + err.message);
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      console.error('Judge0 request error:', err);
+      reject("Network error: " + err.message);
+    });
+    req.write(data);
+    req.end();
   });
 };
 
+const languageIds = {
+  python: 71,      // Python 3.8.1
+  java: 62,       // Java (OpenJDK 13.0.1)
+  c: 48,          // C (GCC 7.4.0)
+  cpp: 52,        // C++ (GCC 7.4.0)
+  ruby: 72,       // Ruby 2.7.0
+  go: 60,         // Go 1.13.5
+  rust: 73,       // Rust 1.40.0
+  php: 68,        // PHP 7.4.1
+  swift: 83,      // Swift 5.2.3
+  kotlin: 78,     // Kotlin 1.3.70
+  scala: 82,      // Scala 2.13.2
+  perl: 85,       // Perl 5.28.1
+  lua: 84,        // Lua 5.3.5
+  haskell: 61,    // Haskell (GHC 8.8.1)
+  bash: 46,       // Bash 5.0.0
+  csharp: 51,     // C# (Mono 6.6.0.161)
+  r: 80,          // R (4.0.0)
+  dart: 90,       // Dart (2.19.2)
+  typescript: 74, // TypeScript 3.7.4
+  elixir: 57,     // Elixir 1.9.4
+  fsharp: 87,     // F# (.NET Core)
+  objectivec: 79, // Objective-C (Clang 7.0.1)
+  vb: 84          // Visual Basic.Net
+};
 
-// JavaScript Runner
+// ============================================
+// JavaScript Runner (Local - no external API needed)
+// ============================================
 export const runJavaScript = async (code, input = "") => {
   return new Promise((resolve, reject) => {
     try {
       const start = process.hrtime();
-      const startMem = process.memoryUsage().rss;
       let output = "";
       const inputs = input.split('\n').filter(line => line.trim());
       let inputIndex = 0;
 
       const originalLog = console.log;
-      console.log = (...args) => {
-        output += args.join(" ") + "\n";
-      };
+      console.log = (...args) => { output += args.join(" ") + "\n"; };
 
-      // Mock prompt to return input values
       global.prompt = (message) => {
         let value = inputs[inputIndex] || "";
         inputIndex++;
-        // Extract first number if multiple values on same line
-        value = value.trim().split(/\s+/)[0];
         output += `${message} ${value}\n`;
         return value;
       };
 
-      // Mock alert to log output (only if not already logged)
       global.alert = (message) => {
-        // Don't add if console.log already added it
-        if (!output.includes(message)) {
-          output += message + "\n";
-        }
+        if (!output.includes(message)) output += message + "\n";
       };
 
+      // Run the code directly - user code already has console.log statements
       eval(code);
 
       console.log = originalLog;
@@ -93,7 +160,7 @@ export const runJavaScript = async (code, input = "") => {
       resolve({
         stdout: output.trim() || "No output",
         executionTime: `${(s * 1e3 + ns / 1e6).toFixed(2)} ms`,
-        memoryUsed: `${((process.memoryUsage().rss - startMem) / 1024 / 1024).toFixed(2)} MB`,
+        memoryUsed: "0 MB"
       });
     } catch (err) {
       reject("JavaScript Error: " + err.message);
@@ -101,182 +168,132 @@ export const runJavaScript = async (code, input = "") => {
   });
 };
 
-// Python Runner
+// Strip TypeScript for JS execution
+const stripTypeScript = (code) => {
+  let js = code;
+  js = js.replace(/(let|const|var)\s+(\w+)\s*:\s*[\w\[\]<>]+\s*=/g, '$1 $2 =');
+  js = js.replace(/\((\w+)\s*:\s*[\w\[\]<>]+\)/g, '($1)');
+  js = js.replace(/<[^>]+>/g, '');
+  js = js.replace(/\s+as\s+\w+/g, '');
+  js = js.replace(/\breadonly\s+/g, '');
+  js = js.replace(/(\w)!/g, '$1');
+  return js;
+};
+
+export const runTypeScript = async (code, input = "") => {
+  return runJavaScript(stripTypeScript(code), input);
+};
+
+// ============================================
+// Language runners using Judge0 CE
+// ============================================
 export const runPython = async (code, input = "") => {
-  const filePath = createTempFile("py", code);
-  const python = await detectPythonCommand();
-
-  return new Promise((resolve, reject) => {
-    const start = process.hrtime();
-    const startMem = process.memoryUsage().rss;
-
-    // Pass input via stdin
-    const child = exec(`${python} "${filePath}"`, (err, stdout, stderr) => {
-      const [s, ns] = process.hrtime(start);
-      cleanupFile(filePath);
-      if (err) return reject("Python Error: " + (stderr || err.message));
-      resolve({
-        stdout: stdout.trim() || "No output",
-        executionTime: `${(s * 1e3 + ns / 1e6).toFixed(2)} ms`,
-        memoryUsed: `${((process.memoryUsage().rss - startMem) / 1024 / 1024).toFixed(2)} MB`,
-      });
-    });
-
-    if (input) {
-      child.stdin.write(input);
-    }
-    child.stdin.end();
-  });
+  return runWithJudge0(languageIds.python, code, input);
 };
 
-// C/C++ Runner
-export const runC_CPP = async (code, language, input = "") => {
-  const ext = language === "c" ? "c" : "cpp";
-  const filePath = createTempFile(ext, code);
-  const outPath = filePath.replace(`.${ext}`, "");
-  const compiler = language === "c" ? "gcc" : "g++";
-
-  return new Promise((resolve, reject) => {
-    exec(`${compiler} "${filePath}" -o "${outPath}"`, (err, _, stderr) => {
-      if (err) return reject("Compilation Error: " + stderr);
-
-      const start = process.hrtime();
-      const startMem = process.memoryUsage().rss;
-      const child = exec(`"${outPath}"`, (err2, stdout, stderr2) => {
-        const [s, ns] = process.hrtime(start);
-        cleanupFile(filePath);
-        cleanupFile(outPath);
-        if (err2) return reject("Runtime Error: " + stderr2);
-        resolve({
-          stdout: stdout.trim() || "No output",
-          executionTime: `${(s * 1e3 + ns / 1e6).toFixed(2)} ms`,
-          memoryUsed: `${((process.memoryUsage().rss - startMem) / 1024 / 1024).toFixed(2)} MB`,
-        });
-      });
-
-      if (input) child.stdin.write(input);
-      child.stdin.end();
-    });
-  });
-};
-
-// Check if Java is installed
-const checkJavaInstalled = () => {
-  return new Promise((resolve) => {
-    exec('javac -version', (err) => {
-      resolve(!err);
-    });
-  });
-};
-
-// Java Runner with fallback to online API
 export const runJava = async (code, input = "") => {
-  const javaInstalled = await checkJavaInstalled();
-
-  if (!javaInstalled) {
-    // Use JDoodle API as fallback
-    return runJavaOnline(code, input);
+  let javaCode = code;
+  
+  const hasMainMethod = /public\s+static\s+void\s+main\s*\(\s*String/.test(code);
+  const hasClassDefinition = /class\s+\w+\s*\{/.test(code);
+  
+  if (hasMainMethod && hasClassDefinition) {
+    return runWithJudge0(languageIds.java, javaCode, input);
   }
-
-  const match = code.match(/public\s+class\s+(\w+)/);
-  const className = match ? match[1] : "Main";
-  const filePath = createTempFile("java", code, className);
-
-  return new Promise((resolve, reject) => {
-    exec(`javac "${filePath}"`, (err, stdout, stderr) => {
-      if (err) {
-        cleanupFile(filePath);
-        return reject("Java Compilation Error:\n" + (stderr || stdout));
-      }
-
-      const start = process.hrtime();
-      const startMem = process.memoryUsage().rss;
-
-      const child = exec(`java -cp "${tempDir}" ${className}`, (err2, stdout2, stderr2) => {
-        const [s, ns] = process.hrtime(start);
-
-        cleanupFile(filePath);
-        cleanupFile(path.join(tempDir, `${className}.class`));
-
-        if (err2) return reject("Java Runtime Error:\n" + (stderr2 || stdout2));
-
-        resolve({
-          stdout: stdout2.trim() || "No output",
-          executionTime: `${(s * 1e3 + ns / 1e6).toFixed(2)} ms`,
-          memoryUsed: `${((process.memoryUsage().rss - startMem) / 1024 / 1024).toFixed(2)} MB`,
-        });
-      });
-
-      if (input) child.stdin.write(input);
-      child.stdin.end();
-    });
-  });
+  
+  if (hasClassDefinition) {
+    javaCode = javaCode.replace(/class\s+(\w+)/, 'class Main');
+    if (!hasMainMethod) {
+      javaCode = javaCode.replace(/\}$/, '\n    public static void main(String[] args) {\n        \n    }\n}');
+    }
+  } else {
+    javaCode = `public class Main {\n    public static void main(String[] args) {\n${code}\n    }\n}`;
+  }
+  
+  return runWithJudge0(languageIds.java, javaCode, input);
 };
 
-// Online Java execution using Piston API (free)
-const runJavaOnline = async (code, input = "") => {
-  const https = await import('https');
-  const start = Date.now();
+export const runC_CPP = async (code, language, input = "") => {
+  const langId = language === "c" ? languageIds.c : languageIds.cpp;
   
-  return new Promise((resolve, reject) => {
-    const data = JSON.stringify({
-      language: "java",
-      version: "15.0.2",
-      files: [{
-        content: code
-      }],
-      stdin: input
-    });
+  let processedCode = code;
+  if (!code.endsWith('\n')) {
+    processedCode = code + '\n';
+  }
+  
+  const extraArgs = language === "c" ? { compiler_args: ["-x", "c"] } : {};
+  
+  return runWithJudge0(langId, processedCode, input, extraArgs);
+};
 
-    const options = {
-      hostname: 'emkc.org',
-      port: 443,
-      path: '/api/v2/piston/execute',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': data.length
-      }
-    };
+export const runRuby = async (code, input = "") => {
+  return runWithJudge0(languageIds.ruby, code, input);
+};
 
-    const req = https.request(options, (res) => {
-      let responseData = '';
+export const runGo = async (code, input = "") => {
+  return runWithJudge0(languageIds.go, code, input);
+};
 
-      res.on('data', (chunk) => {
-        responseData += chunk;
-      });
+export const runRust = async (code, input = "") => {
+  return runWithJudge0(languageIds.rust, code, input);
+};
 
-      res.on('end', () => {
-        try {
-          const result = JSON.parse(responseData);
-          const executionTime = Date.now() - start;
-          
-          // Estimate memory based on code complexity
-          const codeLength = code.length;
-          const estimatedMemory = (8 + (codeLength / 100)).toFixed(2);
-          
-          if (result.compile && result.compile.code !== 0) {
-            reject("Java Compilation Error:\n" + result.compile.stderr);
-          } else if (result.run && result.run.code !== 0 && result.run.stderr) {
-            reject("Java Runtime Error:\n" + result.run.stderr);
-          } else {
-            resolve({
-              stdout: result.run.stdout || result.run.output || "No output",
-              executionTime: `${executionTime} ms`,
-              memoryUsed: `${estimatedMemory} MB`,
-            });
-          }
-        } catch (err) {
-          reject("Failed to execute Java code: " + err.message);
-        }
-      });
-    });
+export const runPHP = async (code, input = "") => {
+  return runWithJudge0(languageIds.php, code, input);
+};
 
-    req.on('error', (err) => {
-      reject("Network error: " + err.message);
-    });
+export const runSwift = async (code, input = "") => {
+  let processedCode = code;
+  if (!code.endsWith('\n')) {
+    processedCode = code + '\n';
+  }
+  return runWithJudge0(languageIds.swift, processedCode, input);
+};
 
-    req.write(data);
-    req.end();
-  });
+export const runKotlin = async (code, input = "") => {
+  return runWithJudge0(languageIds.kotlin, code, input);
+};
+
+export const runScala = async (code, input = "") => {
+  return runWithJudge0(languageIds.scala, code, input);
+};
+
+export const runPerl = async (code, input = "") => {
+  return runWithJudge0(languageIds.perl, code, input);
+};
+
+export const runLua = async (code, input = "") => {
+  return runWithJudge0(languageIds.lua, code, input);
+};
+
+export const runHaskell = async (code, input = "") => {
+  return runWithJudge0(languageIds.haskell, code, input);
+};
+
+export const runBash = async (code, input = "") => {
+  return runWithJudge0(languageIds.bash, code, input);
+};
+
+export const runCSharp = async (code, input = "") => {
+  return runWithJudge0(languageIds.csharp, code, input);
+};
+
+export const runR = async (code, input = "") => {
+  return runWithJudge0(languageIds.r, code, input);
+};
+
+export const runDart = async (code, input = "") => {
+  return runWithJudge0(languageIds.dart, code, input);
+};
+
+export const runJulia = async (code, input = "") => {
+  return runWithJudge0(languageIds.julia, code, input);
+};
+
+export const runElixir = async (code, input = "") => {
+  return runWithJudge0(languageIds.elixir, code, input);
+};
+
+export const runPowerShell = async (code, input = "") => {
+  return runWithJudge0(languageIds.powershell, code, input);
 };

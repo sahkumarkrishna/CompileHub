@@ -1,14 +1,21 @@
-import React, { useState} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FiMail, FiLock, FiUser } from "react-icons/fi";
+import { FiMail, FiLock, FiUser, FiCode, FiShield } from "react-icons/fi";
 
 const AuthForm = () => {
-  const [isSignIn, setIsSignIn] = useState(false);
+  const [isSignIn, setIsSignIn] = useState(true);
   const [loading, setLoading] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (isLoggedIn) {
+      navigate("/Practice", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -28,6 +35,12 @@ const AuthForm = () => {
       if (token) localStorage.setItem("token", token);
       if (user) {
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userName", user.name || "");
+        localStorage.setItem("userEmail", user.email || "");
+        if (user.profilePhoto) {
+          localStorage.setItem("userProfilePhoto", user.profilePhoto);
+        }
+        window.dispatchEvent(new Event("profileUpdated"));
       }
 
       toast.success("Sign In Successful!");
@@ -67,132 +80,196 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-4 bg-gradient-to-br from-gray-900 via-emerald-900 to-gray-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-      <div className="absolute top-20 left-20 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      
-      <div className="card max-w-6xl w-full p-0 overflow-hidden animate-fadeIn relative z-10">
-        <div className="flex flex-col md:flex-row min-h-[600px]">
-          <div className="md:w-2/5 w-full bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 text-white flex flex-col justify-center items-center p-12 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
-            <div className="text-center space-y-6 relative z-10">
-              <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-4 animate-float">
-                <FiLock className="w-10 h-10" />
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      <div className="hidden lg:flex lg:w-1/2 bg-[#030712] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 50% 50%, transparent 0%, #030712 70%)`,
+        }}>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]">
+            <div className="absolute inset-0 rounded-full border border-blue-500/20 animate-pulse" style={{ animationDuration: '4s' }}></div>
+            <div className="absolute inset-8 rounded-full border border-purple-500/20 animate-pulse" style={{ animationDuration: '3s', animationDelay: '1s' }}></div>
+            <div className="absolute inset-16 rounded-full border border-cyan-500/20 animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.5s' }}></div>
+          </div>
+        </div>
+
+        <div className="relative z-10 w-full flex flex-col justify-between p-8 lg:p-12 xl:p-16">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-blue-500/30">
+              <FiCode className="w-5 h-5 text-blue-400" />
+            </div>
+            <span className="text-xl font-semibold text-white">CompileHub</span>
+          </div>
+
+          <div className="space-y-6">
+            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
+              {isSignIn ? "Welcome back" : "Get Started"}
+            </h1>
+            <p className="text-base xl:text-lg text-gray-400 max-w-md leading-relaxed">
+              {isSignIn
+                ? "Sign in to access your powerful online compiler and continue coding instantly."
+                : "Create your account and start compiling code in over 50 programming languages."}
+            </p>
+            <div className="flex items-center gap-4 pt-4">
+              <div className="flex -space-x-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 border-2 border-gray-900"></div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 border-2 border-gray-900"></div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 border-2 border-gray-900"></div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-gray-900"></div>
               </div>
-              <h2 className="text-5xl font-bold drop-shadow-lg">
-                {isSignIn ? "Welcome Back!" : "Join Us Today!"}
-              </h2>
-              <p className="text-emerald-50 text-base max-w-xs mx-auto leading-relaxed">
-                {isSignIn
-                  ? "Sign in to access your powerful online compiler and continue coding."
-                  : "Create an account and start compiling code in multiple languages instantly!"}
-              </p>
-              <button
-                onClick={() => setIsSignIn(!isSignIn)}
-                className="mt-8 border-2 border-white px-10 py-3.5 rounded-full font-bold text-sm tracking-wide hover:bg-white hover:text-emerald-600 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl backdrop-blur-sm"
-              >
-                {isSignIn ? "CREATE ACCOUNT" : "SIGN IN"}
-              </button>
+              <span className="text-sm text-gray-400">Join 10,000+ developers</span>
             </div>
           </div>
 
-          <div className="md:w-3/5 w-full bg-gray-900/50 backdrop-blur-xl text-white flex flex-col justify-center items-center p-12">
-            {isSignIn ? (
-              <>
-                <h2 className="text-5xl font-bold gradient-text mb-3">
-                  Sign In
-                </h2>
-                <p className="text-gray-400 mb-8">Access your compiler account</p>
-                <form
-                  className="flex flex-col items-center space-y-6 w-full max-w-md"
-                  onSubmit={handleSignIn}
-                >
-                  <div className="relative w-full group">
-                    <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-400 transition-colors" />
-                    <input
-                      id="signin-email"
-                      type="email"
-                      placeholder="Email Address"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-                  <div className="relative w-full group">
-                    <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-400 transition-colors" />
-                    <input
-                      id="signin-password"
-                      type="password"
-                      placeholder="Password"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn-primary w-full py-4 text-base font-bold"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                        Signing In...
-                      </span>
-                    ) : "SIGN IN"}
-                  </button>
-                </form>
-              </>
-            ) : (
-              <>
-                <h2 className="text-5xl font-bold gradient-text mb-3">
-                  Create Account
-                </h2>
-                <p className="text-gray-400 mb-8">Start your coding journey</p>
-                <form
-                  className="flex flex-col items-center space-y-6 w-full max-w-md"
-                  onSubmit={handleSignUp}
-                >
-                  <div className="relative w-full group">
-                    <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-400 transition-colors" />
-                    <input
-                      id="signup-name"
-                      type="text"
-                      placeholder="Full Name"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-                  <div className="relative w-full group">
-                    <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-400 transition-colors" />
-                    <input
-                      id="signup-email"
-                      type="email"
-                      placeholder="Email Address"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-                  <div className="relative w-full group">
-                    <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-400 transition-colors" />
-                    <input
-                      id="signup-password"
-                      type="password"
-                      placeholder="Password"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn-primary w-full py-4 text-base font-bold"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                        Creating Account...
-                      </span>
-                    ) : "CREATE ACCOUNT"}
-                  </button>
-                </form>
-              </>
-            )}
+          <div className="text-sm text-gray-500">
+            © CompileHub · Privacy · Terms
           </div>
+        </div>
+      </div>
+
+      <div className="lg:hidden bg-[#030712] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-[#030712] to-purple-900/30"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+        
+        <div className="relative z-10 flex items-center justify-center gap-3 py-6 px-4">
+          <div className="w-8 h-8 bg-blue-500/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-blue-500/30">
+            <FiCode className="w-4 h-4 text-blue-400" />
+          </div>
+          <span className="text-lg font-semibold text-white">CompileHub</span>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gray-950">
+        <div className="w-full max-w-sm sm:max-w-md">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex gap-2 p-1 bg-gray-900 rounded-xl mb-6">
+              <button
+                onClick={() => setIsSignIn(true)}
+                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  isSignIn
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setIsSignIn(false)}
+                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  !isSignIn
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              {isSignIn ? "Sign in" : "Create account"}
+            </h2>
+            <p className="text-sm sm:text-base text-gray-400">
+              {isSignIn ? "Welcome back! Please sign in to continue." : "Fill in your details to get started."}
+            </p>
+          </div>
+
+          {isSignIn ? (
+            <form className="space-y-4" onSubmit={handleSignIn}>
+              <div className="space-y-2">
+                <label htmlFor="signin-email" className="block text-sm font-medium text-gray-300">Email</label>
+                <input
+                  id="signin-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 sm:py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-150 shadow-sm shadow-black/10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="signin-password" className="block text-sm font-medium text-gray-300">Password</label>
+                <input
+                  id="signin-password"
+                  type="password"
+                  placeholder="Enter your password"
+                  className="w-full px-4 py-3 sm:py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-150 shadow-sm shadow-black/10"
+                />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer py-1">
+                <input type="checkbox" className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-blue-500 focus:ring-blue-500/50" />
+                <span className="text-sm text-gray-400">Remember me</span>
+              </label>
+              <button
+                type="submit"
+                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-lg shadow-blue-500/25 text-sm sm:text-base"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    Signing In...
+                  </span>
+                ) : (
+                  "Login"
+                )}
+              </button>
+              <Link
+                to="/admin/login"
+                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-lg shadow-emerald-500/25 text-sm sm:text-base flex items-center justify-center gap-2"
+              >
+                <FiShield className="w-4 h-4" />
+                Admin Login
+              </Link>
+            </form>
+          ) : (
+            <form className="space-y-4" onSubmit={handleSignUp}>
+              <div className="space-y-2">
+                <label htmlFor="signup-name" className="block text-sm font-medium text-gray-300">Full Name</label>
+                <input
+                  id="signup-name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  className="w-full px-4 py-3 sm:py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-150 shadow-sm shadow-black/10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="signup-email" className="block text-sm font-medium text-gray-300">Email</label>
+                <input
+                  id="signup-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 sm:py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-150 shadow-sm shadow-black/10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="signup-password" className="block text-sm font-medium text-gray-300">Password</label>
+                <input
+                  id="signup-password"
+                  type="password"
+                  placeholder="Create a password"
+                  className="w-full px-4 py-3 sm:py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all duration-150 shadow-sm shadow-black/10"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-lg shadow-blue-500/25 text-sm sm:text-base"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    Creating Account...
+                  </span>
+                ) : (
+                  "Sign Up"
+                )}
+              </button>
+            </form>
+          )}
+
         </div>
       </div>
     </div>

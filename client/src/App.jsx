@@ -1,4 +1,5 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 import Home from "./pages/Home";
 import AuthForm from "./pages/AuthForm";
@@ -6,46 +7,88 @@ import WatchDemo from "./pages/WatchDemo";
 import PageNotFound from "../PageNotFound";
 import Settings from "./pages/Settings";
 import HistoryPage from "./pages/HistoryPage";
+import Dashboard from "./pages/Dashboard";
 
 
 import MainLayout from "./Layouts/MainLayout";
+import DashboardLayout from "./Layouts/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UserNavbar from "./components/UserNavbar";
+import Footer from "./components/Footer";
 import CompileCode from "./pages/CompileCode";
+import TotalCodes from "./pages/TotalCodes";
+import TotalRuns from "./pages/TotalRuns";
+import ErrorCodes from "./pages/ErrorCodes";
+import Help from "./pages/Help";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminLayout from "./Layouts/AdminLayout";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminCodes from "./pages/admin/AdminCodes";
+import AdminRuns from "./pages/admin/AdminRuns";
+import AdminErrors from "./pages/admin/AdminErrors";
+import AdminStats from "./pages/admin/AdminStats";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminProfile from "./pages/admin/AdminProfile";
+import AdminCreateProblem from "./pages/admin/CreateProblem";
+import AdminProblemDashboard from "./pages/admin/ProblemDashboard";
+import AdminContacts from "./pages/admin/AdminContacts";
+import AdminSubmissions from "./pages/admin/AdminSubmissions";
+import LandingLayout from "./Layouts/LandingLayout";
+import Coding from "./pages/Coding";
+import AllProblems from "./pages/AllProblems";
+import ProblemDetail from "./pages/ProblemDetail";
+import Submissions from "./pages/Submissions";
+import Contact from "./pages/Contact";
+
+const UserLayout = ({ children }) => <MainLayout>{children}</MainLayout>;
+const ProtectedLayout = ({ children }) => <DashboardLayout>{children}</DashboardLayout>;
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: "watchDemo", element: <WatchDemo /> },
-      {
-        path: "compileCode",
-        element: (
-          <ProtectedRoute>
-            <CompileCode/>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "settings",
-        element: (
-          <ProtectedRoute>
-            <Settings />
-          </ProtectedRoute>
-        ),
-      },
-      { path: "history", element: <HistoryPage /> },
-    ],
-  },
+  { path: "/", element: <UserLayout><Home /></UserLayout> },
+  { path: "/coding", element: <UserLayout><Coding /></UserLayout> },
+  { path: "/compiler", element: <UserLayout><CompileCode /></UserLayout> },
+  { path: "/watchDemo", element: <UserLayout><WatchDemo /></UserLayout> },
+  { path: "/problems", element: <ProtectedLayout><AllProblems /></ProtectedLayout> },
+  { path: "/problems/all", element: <UserLayout><AllProblems /></UserLayout> },
+  { path: "/problems/:id", element: <UserLayout><ProblemDetail /></UserLayout> },
   { path: "/login", element: <AuthForm /> },
-
-  { path: "/compileCode", element: <CompileCode /> },
+  { path: "/dashboard", element: <ProtectedLayout><ProtectedRoute><Dashboard /></ProtectedRoute></ProtectedLayout> },
+  { path: "/totalCodes", element: <ProtectedLayout><ProtectedRoute><TotalCodes /></ProtectedRoute></ProtectedLayout> },
+  { path: "/totalRuns", element: <ProtectedLayout><ProtectedRoute><TotalRuns /></ProtectedRoute></ProtectedLayout> },
+  { path: "/history", element: <ProtectedLayout><ProtectedRoute><HistoryPage /></ProtectedRoute></ProtectedLayout> },
+  { path: "/submissions", element: <ProtectedLayout><Submissions /></ProtectedLayout> },
+  { path: "/errorCodes", element: <ProtectedLayout><ProtectedRoute><ErrorCodes /></ProtectedRoute></ProtectedLayout> },
+  { path: "/settings", element: <ProtectedLayout><ProtectedRoute><Settings /></ProtectedRoute></ProtectedLayout> },
+  { path: "/help", element: <UserLayout><Help /></UserLayout> },
+  { path: "/contact", element: <UserLayout><Contact /></UserLayout> },
+  { path: "/compileCode", element: <UserLayout><CompileCode /></UserLayout> },
+  { path: "/admin/login", element: <AdminLogin /> },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { path: "dashboard", element: <AdminDashboard /> },
+      { path: "users", element: <AdminUsers /> },
+      { path: "codes", element: <AdminCodes /> },
+      { path: "runs", element: <AdminRuns /> },
+      { path: "errors", element: <AdminErrors /> },
+      { path: "stats", element: <AdminStats /> },
+      { path: "profile", element: <AdminProfile /> },
+      { path: "problem-dashboard", element: <AdminProblemDashboard /> },
+      { path: "create-problem", element: <AdminCreateProblem /> },
+      { path: "edit-problem/:id", element: <AdminCreateProblem /> },
+      { path: "submissions", element: <AdminSubmissions /> },
+      { path: "contacts", element: <AdminContacts /> },
+    ]
+  },
   { path: "*", element: <PageNotFound /> },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <RouterProvider router={router} />
+  );
 }
 
 export default App;

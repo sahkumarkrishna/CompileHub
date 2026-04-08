@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'; // or use `require('mongoose')` in CommonJS
+import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {

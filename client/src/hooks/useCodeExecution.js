@@ -10,8 +10,9 @@ export const useCodeExecution = () => {
     setLoading(true);
     setOutput('');
     try {
-      const API_URL = import.meta.env.VITE_API_COMPILE_URL;
-      const res = await axios.post(`${API_URL}compile`, { language, code, input });
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const COMPILE_URL = `${API_URL}/compile`;
+      const res = await axios.post(COMPILE_URL, { language, code, input });
       const data = res.data;
       const runOutput = `Output:\n${data.output}\n\nExecution Time: ${data.executionTime}\nMemory Used: ${data.memoryUsed}`;
       setOutput(runOutput);
