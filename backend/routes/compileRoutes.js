@@ -1,6 +1,6 @@
 import express from 'express';
 import { compileCode, getUserStats, getUserSnippets, saveSnippet, getSavedSnippets, getUserSubmissions } from '../controllers/compileController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+import authMiddleware from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
 
