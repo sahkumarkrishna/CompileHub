@@ -34,7 +34,7 @@ import AdminCreateProblem from "./pages/admin/CreateProblem";
 import AdminProblemDashboard from "./pages/admin/ProblemDashboard";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminSubmissions from "./pages/admin/AdminSubmissions";
-import LandingLayout from "./Layouts/LandingLayout";
+import Logout from "./pages/Logout";
 import Coding from "./pages/Coding";
 import AllProblems from "./pages/AllProblems";
 import ProblemDetail from "./pages/ProblemDetail";
@@ -52,6 +52,8 @@ const router = createBrowserRouter([
   { path: "/problems", element: <ProtectedLayout><AllProblems /></ProtectedLayout> },
   { path: "/problems/all", element: <UserLayout><AllProblems /></UserLayout> },
   { path: "/problems/:id", element: <UserLayout><ProblemDetail /></UserLayout> },
+  { path: "/practice", element: <UserLayout><AllProblems /></UserLayout> },
+  { path: "/logout", element: <Logout /> },
   { path: "/login", element: <AuthForm /> },
   { path: "/dashboard", element: <ProtectedLayout><ProtectedRoute><Dashboard /></ProtectedRoute></ProtectedLayout> },
   { path: "/totalCodes", element: <ProtectedLayout><ProtectedRoute><TotalCodes /></ProtectedRoute></ProtectedLayout> },

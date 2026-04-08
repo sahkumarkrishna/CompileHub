@@ -381,7 +381,6 @@ const Home = () => {
 
       <Feedback />
 
-      <Footer />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { 
   Code, Play, AlertTriangle, Languages, 
@@ -15,6 +15,7 @@ import {
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalCodes: 0,
     totalRuns: 0,
@@ -61,6 +62,12 @@ const Dashboard = () => {
       }
     } catch (err) {
       console.error("Failed to fetch stats:", err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("isLoggedIn");
+        navigate("/login");
+        return;
+      }
       setError(err.response?.data?.message || "Failed to load dashboard data");
     } finally {
       setIsLoading(false);

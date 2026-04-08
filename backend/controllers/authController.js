@@ -100,7 +100,7 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'compilehub_secret_key_2024',
       { expiresIn: '1d' }
     );
 
@@ -186,7 +186,7 @@ export const adminLogin = async (req, res) => {
 
   const token = jwt.sign(
     { userId: 'admin', isAdmin: true },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'compilehub_secret_key_2024',
     { expiresIn: '7d' }
   );
 

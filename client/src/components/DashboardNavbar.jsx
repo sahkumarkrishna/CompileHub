@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FiCode, FiMenu } from "react-icons/fi";
+import { FiCode, FiMenu, FiLogOut } from "react-icons/fi";
 
 const DashboardNavbar = ({ onMenuClick }) => {
   const [userName, setUserName] = useState("User");
@@ -27,6 +27,16 @@ const DashboardNavbar = ({ onMenuClick }) => {
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : "U";
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userProfilePhoto");
+    window.dispatchEvent(new Event("profileUpdated"));
+    window.location.href = "/";
+  };
+
   return (
     <nav className="sticky top-0 z-30 bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/10">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -46,7 +56,15 @@ const DashboardNavbar = ({ onMenuClick }) => {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+              title="Logout"
+            >
+              <FiLogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
             <Link to="/settings" className="flex items-center gap-2">
               {userPhoto ? (
                 <img 

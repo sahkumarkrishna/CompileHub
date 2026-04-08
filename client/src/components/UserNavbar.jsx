@@ -22,9 +22,11 @@ const UserNavbar = ({ onMenuClick }) => {
     checkAuth();
     window.addEventListener("storage", checkAuth);
     window.addEventListener("profileUpdated", checkAuth);
+    window.addEventListener("logout", checkAuth);
     return () => {
       window.removeEventListener("storage", checkAuth);
       window.removeEventListener("profileUpdated", checkAuth);
+      window.removeEventListener("logout", checkAuth);
     };
   }, [location]);
 
@@ -40,8 +42,13 @@ const UserNavbar = ({ onMenuClick }) => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/login";
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userProfilePhoto");
+    window.dispatchEvent(new Event("profileUpdated"));
+    window.location.href = "/";
   };
 
   return (
@@ -57,7 +64,7 @@ const UserNavbar = ({ onMenuClick }) => {
             </Link>
           </div>
 
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="flex items-center gap-4">
             <Link 
               to="/" 
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
