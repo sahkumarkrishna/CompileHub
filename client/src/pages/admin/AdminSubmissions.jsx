@@ -21,7 +21,7 @@ const AdminSubmissions = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE}submissions`, {
+      const res = await axios.get(`${API_BASE}/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { page, search, status: statusFilter !== 'all' ? statusFilter : '', limit: 20 }
       });

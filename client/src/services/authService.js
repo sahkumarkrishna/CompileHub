@@ -4,12 +4,12 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export const authService = {
   login: async (email, password) => {
-    const response = await axios.post(`${API_BASE}login`, { email, password });
+    const response = await axios.post(`${API_BASE}/login`, { email, password });
     return response.data;
   },
 
   signup: async (name, email, password) => {
-    const response = await axios.post(`${API_BASE}signup`, { name, email, password });
+    const response = await axios.post(`${API_BASE}/signup`, { name, email, password });
     return response.data;
   },
 

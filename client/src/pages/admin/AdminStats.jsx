@@ -20,7 +20,7 @@ const AdminStats = () => {
     try {
       setRefreshing(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE}stats`, {
+      const res = await axios.get(`${API_BASE}/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {

@@ -19,7 +19,7 @@ const AdminRuns = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE}runs`, {
+      const res = await axios.get(`${API_BASE}/runs`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { page, limit: 12 }
       });

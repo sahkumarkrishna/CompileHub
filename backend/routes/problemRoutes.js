@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import {
   createProblem,
   getAllProblems,
@@ -10,7 +11,29 @@ import {
   getProblemStatsById,
   getRandomProblem
 } from '../controllers/problemController.js';
-import adminAuth from './adminRoutes.js';
+
+const adminAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: 'No authorization header' });
+  }
+  
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+  if (!token) return res.status(401).json({ message: 'Unauthorized - no token' });
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.isAdmin) {
+      req.isAdmin = true;
+      req.id = decoded.userId;
+      next();
+    } else {
+      res.status(403).json({ message: 'Admin access required' });
+    }
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
 
 const router = express.Router();
 

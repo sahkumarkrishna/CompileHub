@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FiMail, FiLock, FiUser, FiCode, FiShield } from "react-icons/fi";
@@ -9,13 +9,16 @@ const AuthForm = () => {
   const [loading, setLoading] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     if (isLoggedIn) {
-      navigate("/Practice", { replace: true });
+      navigate(from, { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, from]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ const AuthForm = () => {
 
       toast.success("Sign In Successful!");
       e.target.reset();
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (error) {
       const msg = error.response?.data?.message || "Sign In failed";
       toast.error(msg);
@@ -67,7 +70,7 @@ const AuthForm = () => {
 
     try {
       setLoading(true);
-      await axios.post(`${API_BASE}signup`, { name, email, password });
+      await axios.post(`${API_BASE}/signup`, { name, email, password });
       toast.success("Account created successfully!");
       e.target.reset();
       setIsSignIn(true);

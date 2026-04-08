@@ -16,7 +16,7 @@ const AdminErrors = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE}errors`, {
+      const res = await axios.get(`${API_BASE}/errors`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { page, limit: 12 }
       });
@@ -40,7 +40,7 @@ const AdminErrors = () => {
     if (!window.confirm("Delete this error code?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE}code/${id}`, {
+      await axios.delete(`${API_BASE}/code/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Error code deleted");

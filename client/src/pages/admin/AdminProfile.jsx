@@ -56,7 +56,7 @@ const AdminProfile = () => {
   const fetchProfile = async () => {
     try {
       setFetching(true);
-      const response = await axios.get(`${API_BASE}profile`, {
+      const response = await axios.get(`${API_BASE}/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -142,7 +142,7 @@ const AdminProfile = () => {
       setLoading(true);
 
       const response = await axios.put(
-        `${API_BASE}profile`,
+        `${API_BASE}/profile`,
         {
           name: editData.name,
           email: editData.email,

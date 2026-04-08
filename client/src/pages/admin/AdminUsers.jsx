@@ -21,7 +21,7 @@ const AdminUsers = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE}users`, {
+      const res = await axios.get(`${API_BASE}/users`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { page, search, limit: 12 }
       });
@@ -45,7 +45,7 @@ const AdminUsers = () => {
     if (!window.confirm("Delete this user and all their codes?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE}user/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_BASE}/user/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("User deleted successfully");
       fetchUsers();
     } catch (err) {
@@ -57,7 +57,7 @@ const AdminUsers = () => {
     if (!window.confirm("Unlock this user account?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API_BASE}user/${id}/unlock`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_BASE}/user/${id}/unlock`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("User unlocked successfully");
       fetchUsers();
     } catch (err) {
@@ -73,7 +73,7 @@ const AdminUsers = () => {
     }
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`${API_BASE}users/unlock-by-email`, { email: unlockEmail }, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.post(`${API_BASE}/users/unlock-by-email`, { email: unlockEmail }, { headers: { Authorization: `Bearer ${token}` } });
       if (res.data.success) {
         toast.success(`User ${unlockEmail} has been unlocked!`);
         setUnlockEmail("");

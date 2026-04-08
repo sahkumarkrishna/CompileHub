@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FiMail, FiLock, FiCode, FiShield, FiArrowLeft } from "react-icons/fi";
@@ -8,14 +8,16 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/auth";
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/admin/dashboard";
 
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin") === "true";
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     if (isAdmin && isLoggedIn) {
-      navigate("/admin/dashboard", { replace: true });
+      navigate(from, { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, from]);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ const AdminLogin = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`${API_BASE}admin/login`, { email, password });
+      const response = await axios.post(`${API_BASE}/admin/login`, { email, password });
       const { token, user, isAdmin } = response.data;
 
       if (token) localStorage.setItem("token", token);
@@ -42,7 +44,7 @@ const AdminLogin = () => {
 
       toast.success("Admin Login Successful!");
       e.target.reset();
-      navigate("/admin/dashboard");
+      navigate(from, { replace: true });
     } catch (error) {
       const msg = error.response?.data?.message || "Admin login failed";
       toast.error(msg);

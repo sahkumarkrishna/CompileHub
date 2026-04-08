@@ -50,7 +50,7 @@ const AdminCodes = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE}codes`, {
+      const res = await axios.get(`${API_BASE}/codes`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { page, search, language, limit: 12 }
       });
@@ -74,7 +74,7 @@ const AdminCodes = () => {
     if (!window.confirm("Delete this code?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE}code/${id}`, {
+      await axios.delete(`${API_BASE}/code/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Code deleted");
